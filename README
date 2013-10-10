@@ -1,0 +1,3 @@
+This is a GStreamer wrapper around the raspivid/raspistill
+functionality of the RaspberryPi, providing a GStreamer
+source element capturing from the Rpi camera.
