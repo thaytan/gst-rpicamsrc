@@ -1,10 +1,6 @@
-This package is primarily LGPL (See COPYING.LGPL) Some portions are
-copyright Broadcom Europe Ltd according to the following license. Such files
-carry such copyright headers at the top of the file.
-
-The mmal headers in the mmal/ dir are copyright Broadcom Europe Ltd.
-
-Copyright (c) 2012, Broadcom Europe Ltd
+/*
+Copyright (c) 2013, Broadcom Europe Ltd
+Copyright (c) 2013, James Hughes
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,4 +24,34 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
+#ifndef RASPIPREVIEW_H_
+#define RASPIPREVIEW_H_
+
+/// Layer that preview window should be displayed on
+#define PREVIEW_LAYER      2
+#define PREVIEW_FRAME_RATE_NUM 30
+#define PREVIEW_FRAME_RATE_DEN 1
+
+#define FULL_RES_PREVIEW_FRAME_RATE_NUM 15
+#define FULL_RES_PREVIEW_FRAME_RATE_DEN 1
+
+
+typedef struct
+{
+   int wantPreview;                       /// Display a preview
+   int wantFullScreenPreview;             /// 0 is use previewRect, non-zero to use full screen
+   int opacity;                           /// Opacity of window - 0 = transparent, 255 = opaque
+   MMAL_RECT_T previewWindow;             /// Destination rectangle for the preview window.
+   MMAL_COMPONENT_T *preview_component;   /// Pointer to the created preview display component
+} RASPIPREVIEW_PARAMETERS;
+
+MMAL_STATUS_T raspipreview_create(RASPIPREVIEW_PARAMETERS *state);
+void raspipreview_destroy(RASPIPREVIEW_PARAMETERS *state);
+void raspipreview_set_defaults(RASPIPREVIEW_PARAMETERS *state);
+void raspipreview_dump_parameters(RASPIPREVIEW_PARAMETERS *state);
+int raspipreview_parse_cmdline(RASPIPREVIEW_PARAMETERS *params, const char *arg1, const char *arg2);
+void raspipreview_display_help();
+
+#endif /* RASPIPREVIEW_H_ */

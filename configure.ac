@@ -12,10 +12,15 @@ AC_CONFIG_SRCDIR([src/gstrpicamsrc.c])
 AC_CONFIG_HEADERS([config.h])
 
 dnl required version of automake
-AM_INIT_AUTOMAKE([1.10])
+AM_INIT_AUTOMAKE([-Wno-portability 1.11 no-dist-gzip dist-xz tar-ustar subdir-objects]) 
 
 dnl enable mainainer mode by default
 AM_MAINTAINER_MODE([enable])
+
+dnl Pretty Printing
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
+  [AM_DEFAULT_VERBOSITY=1
+   AC_SUBST(AM_DEFAULT_VERBOSITY)])
 
 dnl check for tools (compiler etc.)
 AC_PROG_CC
@@ -31,12 +36,20 @@ AC_CHECK_PROG(HAVE_PKGCONFIG, pkg-config, [ ], [
 
 dnl Ensure we have basic Raspberry Pi headers and libs
 dnl we need.
-oldCFLAGS="$CFLAGS"
+oldCFLAGS="$CPPFLAGS"
 RPI_INCLUDEPATH="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
-CFLAGS="$CFLAGS $RPI_INCLUDEPATH"
-AC_CHECK_HEADER([bcm_host.h], [], [AC_MSG_ERROR([Raspberry Pi files not found in /opt/vc])],  [AC_INCLUDES_DEFAULT])
+CPPFLAGS="$CPPFLAGS $RPI_INCLUDEPATH"
+AC_CHECK_HEADER([bcm_host.h], [], [AC_MSG_ERROR([Raspberry Pi files not found in /opt/vc])])
 AC_SUBST(RPI_INCLUDEPATH)
-CFLAGS="$oldCFLAGS"
+CPPFLAGS="$oldCPPFLAGS"
+
+oldLDFLAGS="$LDFLAGS"
+RPI_LIBFLAGS="-L/opt/vc/lib"
+LDFLAGS="$LDFLAGS $RPI_LIBFLAGS"
+AC_CHECK_LIB([bcm_host], [bcm_host_init], [], [AC_MSG_ERROR([Raspberry Pi files not found in /opt/vc])])
+AC_SUBST(RPI_LIBFLAGS)
+LDFLAGS="$oldLDFLAGS"
+
 
 PKG_CHECK_MODULES(GST, [
   gstreamer-1.0 >= $GST_REQUIRED
