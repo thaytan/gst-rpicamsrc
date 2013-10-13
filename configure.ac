@@ -33,6 +33,7 @@ dnl give error and exit if we don't have pkgconfig
 AC_CHECK_PROG(HAVE_PKGCONFIG, pkg-config, [ ], [
   AC_MSG_ERROR([You need to have pkg-config installed!])
 ])
+AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums)
 
 dnl Ensure we have basic Raspberry Pi headers and libs
 dnl we need.

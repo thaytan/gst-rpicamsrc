@@ -1,6 +1,8 @@
 aclocal.m4
 autom4te.cache
 autoregen.sh
+src/gstrpicam-enum-types.c
+src/gstrpicam-enum-types.h
 .deps/
 .libs/
 *.la
