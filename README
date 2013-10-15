@@ -1,3 +1,23 @@
 This is a GStreamer wrapper around the raspivid/raspistill
 functionality of the RaspberryPi, providing a GStreamer
 source element capturing from the Rpi camera.
+
+To use it, you need GStreamer 1.0. On Raspbian, you can use
+the packages being built by a volunteer by adding to your apt sources.list:
+deb http://vontaene.de/raspbian-updates/ . main
+
+Install the GStreamer 1.0 dev packages, then just build and install this module.
+
+For example, again on Raspbian:
+
+./autogen --prefix=/usr --libdir=/usr/lib/arm-linux-gnueabihf/
+make
+sudo make install
+
+Then, you can try out the camera with a pipeline line:
+gst-launch-1.0 rpicamsrc bitrate=1000000 ! filesink location=test.h264
+should produce a file called test.h264, while showing a preview window
+on the screen.
+
+gst-inspect-1.0 rpicamsrc to get an idea of the properties that have been
+implemented.
