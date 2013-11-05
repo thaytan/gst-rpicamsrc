@@ -2,8 +2,9 @@ plugin_LTLIBRARIES = libgstrpicamsrc.la
 
 ENUM_FILES = gstrpicam_types.h
 
-libgstrpicamsrc_la_SOURCES = gstrpicamsrc.c gstrpicamsrc.h \
+libgstrpicamsrc_la_SOURCES = \
    $(ENUM_FILES) gstrpicam-enum-types.h gstrpicam-enum-types.c \
+   gstrpicamsrc.c gstrpicamsrc.h \
    RaspiCapture.c RaspiCamControl.c RaspiPreview.c \
    RaspiCapture.h RaspiCamControl.h RaspiPreview.h
 
@@ -16,7 +17,7 @@ libgstrpicamsrc_la_LIBTOOLFLAGS = --tag=disable-static
 gstrpicam-enum-types.h: gstrpicam-enums-template.h $(ENUM_FILES) $(GLIB_MKENUMS)
 	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.h $(ENUM_FILES)) > $@
 
-gstrpicam-enum-types.c: gstrpicam-enums-template.c $(ENUM_FILES) $(GLIB_MKENUMS)
+gstrpicam-enum-types.c: gstrpicam-enum-types.h gstrpicam-enums-template.c $(ENUM_FILES) $(GLIB_MKENUMS)
 	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.c $(ENUM_FILES)) > $@
 
 noinst_HEADERS = gstrpicamsrc.h RaspiCapture.h RaspiCamControl.h RaspiPreview.h gstrpicam-enum-types.h $(ENUM_FILES)
