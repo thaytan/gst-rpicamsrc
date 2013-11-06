@@ -1,9 +1,10 @@
 plugin_LTLIBRARIES = libgstrpicamsrc.la
 
 ENUM_FILES = gstrpicam_types.h
+BUILT_SOURCES = gstrpicam-enum-types.h gstrpicam-enum-types.c
 
 libgstrpicamsrc_la_SOURCES = \
-   $(ENUM_FILES) gstrpicam-enum-types.h gstrpicam-enum-types.c \
+   $(ENUM_FILES) $(BUILT_SOURCES) \
    gstrpicamsrc.c gstrpicamsrc.h \
    RaspiCapture.c RaspiCamControl.c RaspiPreview.c \
    RaspiCapture.h RaspiCamControl.h RaspiPreview.h
@@ -21,4 +22,4 @@ gstrpicam-enum-types.c: gstrpicam-enum-types.h gstrpicam-enums-template.c $(ENUM
 	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.c $(ENUM_FILES)) > $@
 
 noinst_HEADERS = gstrpicamsrc.h RaspiCapture.h RaspiCamControl.h RaspiPreview.h gstrpicam-enum-types.h $(ENUM_FILES)
-BUILT_FILES = gstrpicam-enum-types.h gstrpicam-enum-types.c
+CLEANFILES = $(BUILT_SOURCES)
