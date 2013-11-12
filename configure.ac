@@ -85,7 +85,7 @@ dnl set the plugindir where plugins should be installed (for src/Makefile.am)
 if test "x${prefix}" = "x$HOME"; then
   plugindir="$HOME/.gstreamer-1.0/plugins"
 else
-  plugindir="\$(libdir)/gstreamer-1.0"
+  plugindir="`pkg-config gstreamer-1.0 --variable pluginsdir`"
 fi
 AC_SUBST(plugindir)
 
