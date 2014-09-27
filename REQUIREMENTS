@@ -1,0 +1,11 @@
+gst-rpicamsrc build requirements:
+
+	- autoconf
+	- automake
+	- libtool
+	- libgstreamer1.0-dev
+	- libgstreamer-plugins-base1.0-dev
+	- libraspberrypi-dev
+
+These are raspbian package names, they might be called
+differently on other distros.

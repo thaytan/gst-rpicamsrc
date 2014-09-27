@@ -1,4 +1,4 @@
-This is a GStreamer wrapper around the raspivid/raspistill
+gst-rpicamsrc is a GStreamer wrapper around the raspivid/raspistill
 functionality of the RaspberryPi, providing a GStreamer
 source element capturing from the Rpi camera.
 
@@ -21,3 +21,5 @@ on the screen.
 
 gst-inspect-1.0 rpicamsrc to get an idea of the properties that have been
 implemented.
+
+See the REQUIREMENTS file for the full list of build requirements.
