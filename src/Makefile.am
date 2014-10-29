@@ -6,6 +6,7 @@ BUILT_SOURCES = gstrpicam-enum-types.h gstrpicam-enum-types.c
 libgstrpicamsrc_la_SOURCES = \
    $(ENUM_FILES) $(BUILT_SOURCES) \
    gstrpicamsrc.c gstrpicamsrc.h \
+   gstrpicamsrcdeviceprovider.c gstrpicamsrcdeviceprovider.h \
    RaspiCapture.c RaspiCamControl.c RaspiPreview.c \
    RaspiCapture.h RaspiCamControl.h RaspiPreview.h
 
