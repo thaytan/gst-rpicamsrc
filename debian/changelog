@@ -1,5 +1,5 @@
-gst-rpicamsrc (0.0.1) unstable; urgency=low
+gstreamer1.0-rpicamsrc (1.4.3) UNRELEASED; urgency=medium
 
-  * Initial Release.
+  * Initial release.
 
- -- Holger Steinhaus <hsteinhaus@gmx.de>  Sun, 16 Nov 2014 07:46:52 +0000
+ --  Holger Steinhaus <hsteinhaus@gmx.de>  Mon, 17 Nov 2014 07:42:56 +0000
