@@ -10,7 +10,7 @@ Install the GStreamer 1.0 dev packages, then just build and install this module.
 
 For example, again on Raspbian:
 
-./autogen --prefix=/usr --libdir=/usr/lib/arm-linux-gnueabihf/
+./autogen.sh --prefix=/usr --libdir=/usr/lib/arm-linux-gnueabihf/
 make
 sudo make install
 
