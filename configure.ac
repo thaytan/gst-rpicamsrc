@@ -38,7 +38,6 @@ AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums)
 dnl Ensure we have basic Raspberry Pi headers and libs
 dnl we need.
 oldCFLAGS="$CPPFLAGS"
-#RPI_INCLUDEPATH="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
 RPI_INCLUDEPATH="$INCLUDEPATH -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
 CPPFLAGS="$CPPFLAGS $RPI_INCLUDEPATH"
 AC_CHECK_HEADER([bcm_host.h], [], [AC_MSG_ERROR([Raspberry Pi files not found in /opt/vc])])
