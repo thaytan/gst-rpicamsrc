@@ -1,0 +1,5 @@
+gstreamer1.0-rpicamsrc (1.4.4.2) jessie; urgency=medium
+
+  * Initial release.
+
+ --  hornetwl <hornetwlfpv@googlemail.com>  Mon, 17 Nov 2014 07:42:56 +0000

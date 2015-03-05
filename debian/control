@@ -1,0 +1,12 @@
+Source: gstreamer1.0-rpicamsrc
+Priority: optional
+Section: libs
+Maintainer: Holger Steinhaus <hsteinhaus@gmx.de>
+Build-Depends: debhelper (>= 9), autotools-dev, libtool, libgstreamer1.0-dev, libgstreamer-plugins-base1.0-dev, libraspberrypi-dev, pkg-config
+Standards-Version: 3.9.5
+Homepage: https://github.com/thaytan/gst-rpicamsrc.git
+
+Package: gstreamer1.0-rpicamsrc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgstreamer1.0-0, gstreamer1.0-plugins-base, libraspberrypi0
+Description: GStreamer plugin for RPI-builtin camera
