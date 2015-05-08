@@ -1,5 +1,6 @@
 AM_CPPFLAGS = \
-    $(GST_CFLAGS)
+    $(GST_CFLAGS) \
+    $(RPI_INCLUDEPATH)
 
 AM_CFLAGS = \
     -Wall \
@@ -12,4 +13,5 @@ bin_PROGRAMS = \
 test_color_balance_SOURCES = test_color_balance.c
 
 test_color_balance_LDADD = \
-    $(GST_LIBS)
+    $(GST_LIBS) \
+    $(RPI_LIBFLAGS)
