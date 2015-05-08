@@ -1,6 +1,7 @@
 aclocal.m4
 autom4te.cache
 autoregen.sh
+compile
 src/gstrpicam-enum-types.c
 src/gstrpicam-enum-types.h
 .deps/
@@ -20,3 +21,4 @@ missing
 stamp-*
 gstrpicamsrc-*.tar.*
 *~
+debian/files
