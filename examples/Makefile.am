@@ -7,7 +7,7 @@ AM_CFLAGS = \
     -Wextra \
     -Werror
 
-bin_PROGRAMS = \
+noinst_PROGRAMS = \
     test-color-balance
 
 test_color_balance_SOURCES = test_color_balance.c
