@@ -1,4 +1,4 @@
-gstreamer1.0-rpicamsrc (1.4.4.2) jessie; urgency=medium
+gstreamer1.0-rpicamsrc (1.0.0) wheezy; urgency=medium
 
   * Initial release.
 
