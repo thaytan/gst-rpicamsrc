@@ -3,6 +3,7 @@ gst-rpicamsrc build requirements:
 	- autoconf
 	- automake
 	- libtool
+        - pkg-config
 	- libgstreamer1.0-dev
 	- libgstreamer-plugins-base1.0-dev
 	- libraspberrypi-dev
