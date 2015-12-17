@@ -26,5 +26,5 @@ TMP     = $(CURDIR)/debian/$(PACKAGE)
 
 override_dh_auto_install:
 	dh_auto_install
-	find $(TMP) -name '*.la' | xargs rm --verbose
+	find $(TMP) -name '*.la' | xargs rm --verbose || true
 
