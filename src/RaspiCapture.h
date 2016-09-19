@@ -94,6 +94,7 @@ typedef struct
    int bitrate;                        /// Requested bitrate
    int fps_n;                      /// Requested frame rate (fps) numerator
    int fps_d;                      /// Requested frame rate (fps) denominator
+   int quality;					   /// JPEG encoding quality
    int intraperiod;                    /// Intra-refresh period (key frame rate)
    int quantisationParameter;          /// Quantisation parameter - quality. Set bitrate 0 and set this for variable bitrate
    int bInlineHeaders;                  /// Insert inline headers to stream (SPS, PPS)
@@ -128,5 +129,7 @@ void raspi_capture_free(RASPIVID_STATE *state);
 gboolean raspi_capture_request_i_frame(RASPIVID_STATE *state);
 
 G_END_DECLS
+
+#define USE_RASPUTIN 1
 
 #endif

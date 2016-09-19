@@ -91,6 +91,12 @@ enum
 {
   PROP_0,
   PROP_CAMERA_NUMBER,
+#if USE_RASPUTIN
+  PROP_WIDTH,
+  PROP_HEIGHT,
+  PROP_FPS,
+  PROP_QUALITY,
+#endif
   PROP_BITRATE,
   PROP_KEYFRAME_INTERVAL,
   PROP_PREVIEW,
@@ -158,6 +164,21 @@ enum
 #define EXPOSURE_MODE_DEFAULT GST_RPI_CAM_SRC_EXPOSURE_MODE_AUTO
 #define EXPOSURE_METERING_MODE_DEFAULT GST_RPI_CAM_SRC_EXPOSURE_METERING_MODE_AVERAGE
 
+#if USE_RASPUTIN
+#define WIDTH_DEFAULT 1920
+#define WIDTH_HIGHEST 1920
+#define WIDTH_LOWEST 100
+#define HEIGHT_DEFAULT 1080
+#define HEIGHT_HIGHEST 1080
+#define HEIGHT_LOWEST 100
+#define FPS_DEFAULT 30
+#define FPS_LOWEST 0
+#define FPS_HIGHEST 90
+#define QUALITY_DEFAULT 50
+#define QUALITY_LOWEST 1
+#define QUALITY_HIGHEST 100
+#endif
+
 /*
    params->exposureMode = MMAL_PARAM_EXPOSUREMODE_AUTO;
    params->exposureMeterMode = MMAL_PARAM_EXPOSUREMETERINGMODE_AVERAGE;
@@ -172,12 +193,21 @@ enum
    params->roi.w = params->roi.h = 1.0;
 */
 
+#if !USE_RASPUTIN
 #define RAW_AND_JPEG_CAPS \
   GST_VIDEO_CAPS_MAKE (GST_VIDEO_FORMATS_ALL) ";" \
   "image/jpeg,"                                   \
   "width = " GST_VIDEO_SIZE_RANGE ","             \
   "height = " GST_VIDEO_SIZE_RANGE ","            \
   "framerate = " GST_VIDEO_FPS_RANGE
+#endif
+#if USE_RASPUTIN
+#define RAW_AND_JPEG_CAPS \
+  "image/jpeg,"                                   \
+  "width = " GST_VIDEO_SIZE_RANGE ","             \
+  "height = " GST_VIDEO_SIZE_RANGE ","            \
+  "framerate = " GST_VIDEO_FPS_RANGE
+#endif
 #define H264_CAPS               \
   "video/x-h264, "                              \
   "width = " GST_VIDEO_SIZE_RANGE ", "          \
@@ -196,7 +226,12 @@ enum
 static GstStaticPadTemplate video_src_template = GST_STATIC_PAD_TEMPLATE ("src",
     GST_PAD_SRC,
     GST_PAD_ALWAYS,
+#if !USE_RASPUTIN
     GST_STATIC_CAPS ( /*RAW_AND_JPEG_CAPS "; " */ H264_CAPS)
+#endif
+#if USE_RASPUTIN
+    GST_STATIC_CAPS (RAW_AND_JPEG_CAPS)
+#endif
     );
 
 
@@ -292,6 +327,26 @@ gst_rpi_cam_src_class_init (GstRpiCamSrcClass * klass)
       g_param_spec_int ("camera-number", "Camera Number",
           "Which camera to use on a multi-camera system - 0 or 1", 0,
           1, CAMERA_DEFAULT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+#if USE_RASPUTIN
+  g_object_class_install_property (gobject_class, PROP_WIDTH,
+      g_param_spec_int ("w", "Width", "Width of the video stream", 
+                        WIDTH_LOWEST, WIDTH_HIGHEST, WIDTH_DEFAULT, 
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_HEIGHT,
+      g_param_spec_int ("h", "Height", "Height of the video stream", 
+                        HEIGHT_LOWEST, HEIGHT_HIGHEST, HEIGHT_DEFAULT, 
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_FPS,
+      g_param_spec_int ("fps", "Frames per second", 
+                        "Frames per second of the video stream; 0 = auto, 90 = max", 
+                        FPS_LOWEST, FPS_HIGHEST, FPS_DEFAULT, 
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_QUALITY,
+      g_param_spec_int ("quality", "JPEG quality", 
+                        "JPEG compression quality", 
+                        QUALITY_LOWEST, QUALITY_HIGHEST, QUALITY_DEFAULT, 
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+#endif
   g_object_class_install_property (gobject_class, PROP_BITRATE,
       g_param_spec_int ("bitrate", "Bitrate",
           "Bitrate for encoding. 0 for VBR using quantisation-parameter", 0,
@@ -800,6 +855,20 @@ gst_rpi_cam_src_set_property (GObject * object, guint prop_id,
     case PROP_CAMERA_NUMBER:
       src->capture_config.cameraNum = g_value_get_int (value);
       break;
+#if USE_RASPUTIN
+    case PROP_WIDTH:
+      src->capture_config.width = g_value_get_int (value);
+      break;
+    case PROP_HEIGHT:
+      src->capture_config.height = g_value_get_int (value);
+      break;
+    case PROP_FPS:
+      src->capture_config.fps_n = g_value_get_int (value);
+      break;
+    case PROP_QUALITY:
+      src->capture_config.quality = g_value_get_int (value);
+      break;
+#endif
     case PROP_BITRATE:
       src->capture_config.bitrate = g_value_get_int (value);
       src->capture_config.change_flags |= PROP_CHANGE_ENCODING;
@@ -1010,6 +1079,20 @@ gst_rpi_cam_src_get_property (GObject * object, guint prop_id,
     case PROP_CAMERA_NUMBER:
       g_value_set_int (value, src->capture_config.cameraNum);
       break;
+#if USE_RASPUTIN
+    case PROP_WIDTH:
+      g_value_set_int (value, src->capture_config.width);
+      break;
+    case PROP_HEIGHT:
+      g_value_set_int (value, src->capture_config.height);
+      break;
+    case PROP_FPS:
+      g_value_set_int (value, src->capture_config.fps_n);
+      break;
+    case PROP_QUALITY:
+      g_value_set_int (value, src->capture_config.quality);
+      break;
+#endif
     case PROP_BITRATE:
       g_value_set_int (value, src->capture_config.bitrate);
       break;
@@ -1246,9 +1329,17 @@ gst_rpi_cam_src_get_caps (GstBaseSrc * bsrc, GstCaps * filter)
     goto done;
   /* FIXME: Retrieve limiting parameters from the camera module, max width/height fps-range */
   caps = gst_caps_make_writable (caps);
+#if !USE_RASPUTIN
   gst_caps_set_simple (caps, "width", GST_TYPE_INT_RANGE, 1, 1920, "height",
       GST_TYPE_INT_RANGE, 1, 1080, "framerate", GST_TYPE_FRACTION_RANGE, 0, 1,
       90, 1, NULL);
+#endif
+#if USE_RASPUTIN
+  gst_caps_set_simple (caps, "width", G_TYPE_INT, src->capture_config.width,
+                       "height", G_TYPE_INT, src->capture_config.height,
+                       "framerate", GST_TYPE_FRACTION, src->capture_config.fps_n,
+                       src->capture_config.fps_d, NULL);
+#endif
 done:
   GST_DEBUG_OBJECT (src, "get_caps returning %" GST_PTR_FORMAT, caps);
   return caps;
@@ -1303,10 +1394,18 @@ gst_rpi_cam_src_fixate (GstBaseSrc * basesrc, GstCaps * caps)
   for (i = 0; i < gst_caps_get_size (caps); ++i) {
     structure = gst_caps_get_structure (caps, i);
     /* Fixate to 1920x1080 resolution if possible */
-    gst_structure_fixate_field_nearest_int (structure, "width", 1920);
+    /* No yer not */
+#if !USE_RASPUTIN
+    gst_structure_fixate_field_nearest_int (structure, "width", 1980);
     gst_structure_fixate_field_nearest_int (structure, "height", 1080);
-    gst_structure_fixate_field_nearest_fraction (structure, "framerate", 30, 1);
+    gst_structure_fixate_field_nearest_fraction (structure, "framerate", 30, 1); 
+#endif
+#if USE_RASPUTIN
+    gst_structure_fixate_field (structure, "width");
+    gst_structure_fixate_field (structure, "height");
+    gst_structure_fixate_field (structure, "framerate"); 
     gst_structure_fixate_field (structure, "format");
+#endif
   }
 
   GST_DEBUG_OBJECT (basesrc, "fixated caps %" GST_PTR_FORMAT, caps);

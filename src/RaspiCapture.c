@@ -1182,7 +1182,12 @@ raspi_capture_set_format_and_start(RASPIVID_STATE *state)
         mmal_port_parameter_set(video_port, &fps_range.hdr);
    }
 
+#if USE_RASPUTIN
+   format->encoding = MMAL_ENCODING_I420;
+#endif
+#if !USE_RASPUTIN
    format->encoding = MMAL_ENCODING_OPAQUE;
+#endif
    format->es->video.width = VCOS_ALIGN_UP(config->width, 32);
    format->es->video.height = VCOS_ALIGN_UP(config->height, 16);
    format->es->video.crop.x = 0;
@@ -1210,7 +1215,9 @@ raspi_capture_set_format_and_start(RASPIVID_STATE *state)
    format = still_port->format;
 
    format->encoding = MMAL_ENCODING_OPAQUE;
+#if !USE_RASPUTIN
    format->encoding_variant = MMAL_ENCODING_I420;
+#endif
 
    format->es->video.width = VCOS_ALIGN_UP(config->width, 32);
    format->es->video.height = VCOS_ALIGN_UP(config->height, 16);
@@ -1299,6 +1306,103 @@ gboolean raspi_capture_request_i_frame(RASPIVID_STATE *state)
  */
 static MMAL_STATUS_T create_encoder_component(RASPIVID_STATE *state)
 {
+#if USE_RASPUTIN
+  MMAL_COMPONENT_T *encoder = 0;
+  MMAL_PORT_T *encoder_input = NULL, *encoder_output = NULL;
+  MMAL_STATUS_T status;
+  MMAL_POOL_T *pool;
+  RASPIVID_CONFIG *config = state->config;
+
+  status = mmal_component_create(MMAL_COMPONENT_DEFAULT_IMAGE_ENCODER, &encoder);
+
+  if (status != MMAL_SUCCESS)
+    {
+      vcos_log_error("Unable to create JPEG encoder component");
+      goto error;
+    }
+
+  if (!encoder->input_num || !encoder->output_num)
+    {
+      status = MMAL_ENOSYS;
+      vcos_log_error("Video encoder doesn't have input/output ports");
+      goto error;
+    }
+
+  encoder_input = encoder->input[0];
+  encoder_output = encoder->output[0];
+
+  // We want same format on input and output
+  mmal_format_copy(encoder_output->format, encoder_input->format);
+
+  // rasputin JPEG encoding
+  encoder_output->format->encoding = MMAL_ENCODING_JPEG;
+  
+  encoder_output->buffer_size = encoder_output->buffer_size_recommended;
+
+  // Set size and number of buffers and log to debug
+  if (encoder_output->buffer_size < encoder_output->buffer_size_min)
+    encoder_output->buffer_size = encoder_output->buffer_size_min;
+
+  GST_DEBUG ("encoder buffer size is %u", (guint)encoder_output->buffer_size);
+  
+  encoder_output->buffer_num = encoder_output->buffer_num_recommended;
+
+  if (encoder_output->buffer_num < encoder_output->buffer_num_min)
+    encoder_output->buffer_num = encoder_output->buffer_num_min;
+
+
+  // We need to set the frame rate on output to 0, to ensure it gets
+  // updated correctly from the input framerate when port connected
+  encoder_output->format->es->video.frame_rate.num = 0;
+  encoder_output->format->es->video.frame_rate.den = 1;
+ /* 
+  * Unknown if this is needed; FIXME
+  */
+
+  // Commit the port changes to the output port
+  status = mmal_port_format_commit(encoder_output);
+
+  if (status != MMAL_SUCCESS)
+    {
+      vcos_log_error("Unable to set format on video encoder output port");
+      goto error;
+    }
+
+  // Set quality value
+  status = mmal_port_parameter_set_uint32(encoder_output, MMAL_PARAMETER_JPEG_Q_FACTOR, config->quality);
+
+  if (status != MMAL_SUCCESS)
+    {
+      vcos_log_error("Unable to set JPEG quality");
+      goto error;
+  }
+
+  //  Enable component
+  status = mmal_component_enable(encoder);
+  
+  if (status != MMAL_SUCCESS)
+    {
+      vcos_log_error("Unable to enable video encoder component");
+      goto error;
+    }
+
+  /* Create pool of buffer headers for the output port to consume */
+  pool = mmal_port_pool_create(encoder_output, encoder_output->buffer_num, encoder_output->buffer_size);
+
+  if (!pool)
+    {
+      vcos_log_error("Failed to create buffer header pool for encoder output port %s", encoder_output->name);
+    }
+
+  state->encoder_pool = pool;
+  state->encoder_component = encoder;
+
+  if (config->verbose)
+    fprintf(stderr, "Encoder component done\n");
+
+  return status;
+#endif
+#if !USE_RASPUTIN
    MMAL_COMPONENT_T *encoder = 0;
    MMAL_PORT_T *encoder_input = NULL, *encoder_output = NULL;
    MMAL_STATUS_T status;
@@ -1500,7 +1604,7 @@ static MMAL_STATUS_T create_encoder_component(RASPIVID_STATE *state)
       fprintf(stderr, "Encoder component done\n");
 
    return status;
-
+#endif
    error:
    if (encoder)
       mmal_component_destroy(encoder);
@@ -1727,6 +1831,29 @@ raspi_capture_start(RASPIVID_STATE *state)
   if (config->verbose)
     fprintf(stderr, "Starting video capture\n");
 
+#if USE_RASPUTIN
+  // Send all the buffers to the encoder output port
+  {
+    int num = mmal_queue_length(state->encoder_pool->queue);
+    int q;
+    for (q=0;q<num;q++)
+      {
+        MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(state->encoder_pool->queue);
+
+        if (!buffer)
+          vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+
+        if (mmal_port_send_buffer(state->encoder_output_port, buffer)!= MMAL_SUCCESS)
+          vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
+
+      }
+  }
+  if (mmal_port_parameter_set_boolean(state->camera_video_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
+    {
+      goto error;
+    }
+#endif
+#if !USE_RASPUTIN
   if (mmal_port_parameter_set_boolean(state->camera_video_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
   {
      goto error;
@@ -1748,6 +1875,7 @@ raspi_capture_start(RASPIVID_STATE *state)
 
      }
   }
+#endif
 
   // Now wait until we need to stop. Whilst waiting we do need to check to see if we have aborted (for example
   // out of storage space)
