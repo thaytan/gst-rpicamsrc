@@ -22,3 +22,4 @@ stamp-*
 gstrpicamsrc-*.tar.*
 *~
 debian/files
+/build
