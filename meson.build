@@ -1,5 +1,5 @@
 project('gst-rpicamsrc', 'c', version : '1.0.0',
-  meson_version : '>= 0.34.0')
+  meson_version : '>= 0.34.0', default_options : ['b_asneeded=false'])
 
 gst_req = '>= 1.0.0'
 
