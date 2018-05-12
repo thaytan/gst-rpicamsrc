@@ -1,2 +1,4 @@
 test-color-balance
+test-orientation
+webrtc-unidirectional-h264
 *.o

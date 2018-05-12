@@ -75,6 +75,10 @@ PKG_CHECK_MODULES(GST, [
   ])
 ])
 
+dnl WebRTC needed to build the streaming example 
+PKG_CHECK_MODULES(GST_WEBRTC_EXAMPLE, [ gstreamer-sdp-1.0 gstreamer-webrtc-1.0 libsoup-2.4 >= 2.50 json-glib-1.0 ], HAVE_GST_WEBRTC=yes, HAVE_GST_WEBRTC=no)
+AM_CONDITIONAL(BUILD_GST_WEBRTC_EXAMPLE, test "x$HAVE_GST_WEBRTC" = "xyes")
+
 dnl check if compiler understands -Wall (if yes, add -Wall to GST_CFLAGS)
 AC_MSG_CHECKING([to see if compiler understands -Wall])
 save_CFLAGS="$CFLAGS"
