@@ -22,7 +22,7 @@ TMP     = $(CURDIR)/debian/$(PACKAGE)
 
 # main packaging script based on dh7 syntax
 %:
-	dh $@  --with autotools-dev
+	dh $@  --with autotools-dev,autoreconf
 
 override_dh_auto_install:
 	dh_auto_install

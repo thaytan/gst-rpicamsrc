@@ -939,7 +939,7 @@ raspi_capture_fill_buffer(RASPIVID_STATE *state, GstBuffer **bufp,
 
   /* FIXME: Use our own interruptible cond wait: */
 
-  buffer = mmal_queue_timedwait(state->encoded_buffer_q, 500);
+  buffer = mmal_queue_timedwait(state->encoded_buffer_q, 10500);
 
   if (G_UNLIKELY(buffer == NULL)) {
       return GST_FLOW_ERROR;
@@ -1129,7 +1129,11 @@ raspi_capture_set_format_and_start(RASPIVID_STATE *state)
 
    format = preview_port->format;
 
-   if(config->camera_parameters.shutter_speed > 6000000)
+   if(!config->fps_n) {
+        MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)},
+                                                     { 50, 1000}, {120, 1}};
+        mmal_port_parameter_set(preview_port, &fps_range.hdr);
+   } else if(config->camera_parameters.shutter_speed > 6000000)
    {
         MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)},
                                                      { 50, 1000 }, {166, 1000}};
@@ -1176,7 +1180,11 @@ raspi_capture_set_format_and_start(RASPIVID_STATE *state)
    // Set the encode format on the video  port
    format = video_port->format;
 
-   if(config->camera_parameters.shutter_speed > 6000000)
+   if(!config->fps_n) {
+        MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)},
+                                                     { 50, 1000}, {120, 1}};
+        mmal_port_parameter_set(preview_port, &fps_range.hdr);
+   } else if(config->camera_parameters.shutter_speed > 6000000)
    {
         MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)},
                                                      { 50, 1000 }, {166, 1000}};
