@@ -1,2 +1,0 @@
-option('with-rpi-header-dir', type : 'string', value : '/opt/vc/include')
-option('with-rpi-lib-dir', type : 'string', value : '/opt/vc/lib')
