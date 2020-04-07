@@ -932,7 +932,7 @@ raspi_capture_fill_buffer(RASPIVID_STATE *state, GstBuffer **bufp,
 {
   RASPIVID_CONFIG *config = &state->config;
   GstBuffer *buf = NULL;
-  MMAL_BUFFER_HEADER_T *buffer;
+  MMAL_BUFFER_HEADER_T *buffer = NULL;
   GstFlowReturn ret = GST_FLOW_ERROR;
   /* No timestamps if no clockm or invalid PTS */
   GstClockTime gst_pts = GST_CLOCK_TIME_NONE;
