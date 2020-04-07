@@ -931,13 +931,15 @@ raspi_capture_fill_buffer(RASPIVID_STATE *state, GstBuffer **bufp,
     GstClock *clock, GstClockTime base_time)
 {
   RASPIVID_CONFIG *config = &state->config;
-  GstBuffer *buf;
+  GstBuffer *buf = NULL;
   MMAL_BUFFER_HEADER_T *buffer;
   GstFlowReturn ret = GST_FLOW_ERROR;
   /* No timestamps if no clockm or invalid PTS */
   GstClockTime gst_pts = GST_CLOCK_TIME_NONE;
 
+  int attempts = 3;
   do {
+    GST_INFO ("Trying mmal_queue_timedwait(), attempts left: %d.", attempts);
     buffer = mmal_queue_timedwait(state->encoded_buffer_q, 500);
     // Work around a bug where mmal_queue_timedwait() might return
     // immediately if the internal timeout time aligns exactly
@@ -945,8 +947,10 @@ raspi_capture_fill_buffer(RASPIVID_STATE *state, GstBuffer **bufp,
     if (errno == EINVAL) {
       GST_WARNING ("Retrying mmal_queue_timedwait() due to spurious failure.");
       continue;
+    } else if (buffer != NULL) {
+        attempts = 0;
     }
-  } while (0);
+  } while (--attempts > 0);
 
   if (G_UNLIKELY(buffer == NULL)) {
       return GST_FLOW_ERROR_TIMEOUT;
