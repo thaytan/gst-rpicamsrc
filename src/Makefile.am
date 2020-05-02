@@ -17,10 +17,10 @@ libgstrpicamsrc_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
 libgstrpicamsrc_la_LIBTOOLFLAGS = --tag=disable-static
 
 gstrpicam-enum-types.h: gstrpicam-enums-template.h $(ENUM_FILES) $(GLIB_MKENUMS)
-	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.h $(ENUM_FILES)) > $@
+	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.h --identifier-prefix GstRpiCamSrc --symbol-prefix gst_rpi_cam_src $(ENUM_FILES)) > $@
 
 gstrpicam-enum-types.c: gstrpicam-enum-types.h gstrpicam-enums-template.c $(ENUM_FILES) $(GLIB_MKENUMS)
-	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.c $(ENUM_FILES)) > $@
+	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template gstrpicam-enums-template.c --identifier-prefix GstRpiCamSrc --symbol-prefix gst_rpi_cam_src $(ENUM_FILES)) > $@
 
 noinst_HEADERS = gstrpicamsrc.h RaspiCapture.h RaspiCamControl.h \
     RaspiPreview.h RaspiCLI.h \
