@@ -7,26 +7,18 @@ rpicamsrc_sources = [
   'RaspiCLI.c',
 ]
 
-# This can be simplified once meson gets native support for glib-mkenums (soon)
-glib_mkenums = find_program('glib-mkenums')
+# glib-mkenums
+gnome = import('gnome')
 
-gstrpicam_enum_types_h = custom_target('gstrpicam-enum-types.h',
-  output : 'gstrpicam-enum-types.h',
-  input : files('gstrpicam_types.h'),
-  command : [glib_mkenums, '--template', meson.current_source_dir() + '/gstrpicam-enums-template.h', '@INPUT@'],
-  capture : true)
-
-gstrpicam_enum_types_c = custom_target('gstrpicam-enum-types.c',
-  output : 'gstrpicam-enum-types.c',
-  input : files('gstrpicam_types.h'),
-  depends : [gstrpicam_enum_types_h],
-  command : [glib_mkenums, '--template', meson.current_source_dir() + '/gstrpicam-enums-template.c', '@INPUT@'],
-  capture : true)
+enums = gnome.mkenums_simple('gstrpicam-enum-types',
+  sources: 'gstrpicam_types.h',
+  identifier_prefix: 'GstRpiCamSrc',
+  symbol_prefix: 'gst_rpi_cam_src')
 
 mapfile = 'gstplugin.map'
 
 library('gstrpicamsrc',
-  rpicamsrc_sources, gstrpicam_enum_types_h, gstrpicam_enum_types_c,
+  rpicamsrc_sources, enums,
   c_args : gst_rpicamsrc_args,
   include_directories : config_inc,
   link_args : '-Wl,--version-script,@0@/@1@'.format(meson.current_source_dir(), mapfile),
