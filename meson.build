@@ -4,9 +4,14 @@ add_project_link_arguments('-Wl,--no-as-needed', language: 'c')
 
 gst_req = '>= 1.0.0'
 
-gst_dep = dependency('gstreamer-1.0', version : gst_req, required : false)
-gstbase_dep = dependency('gstreamer-base-1.0', version : gst_req, required : false)
-gstvideo_dep = dependency('gstreamer-video-1.0', version : gst_req, required : false)
+gst_dep = dependency('gstreamer-1.0', version : gst_req, required : false,
+  fallback : ['gstreamer', 'gst_dep'])
+
+gstbase_dep = dependency('gstreamer-base-1.0', version : gst_req, required : false,
+  fallback : ['gstreamer', 'gst_base_dep'])
+
+gstvideo_dep = dependency('gstreamer-video-1.0', version : gst_req, required : false,
+  fallback : ['gst-plugins-base', 'video_dep'])
 
 if not gst_dep.found() or not gstbase_dep.found() or not gstvideo_dep.found()
   error('''
