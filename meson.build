@@ -21,6 +21,11 @@ plugins_install_dir = '@0@/gstreamer-1.0'.format(get_option('libdir'))
 
 cc = meson.get_compiler('c')
 
+# Symbol visibility
+if cc.has_argument('-fvisibility=hidden')
+  add_project_arguments('-fvisibility=hidden', language: 'c')
+endif
+
 rpi_path = get_option('with-rpi-header-dir')
 rpi_paths = ['-I' + rpi_path, '-I' + rpi_path + '/interface/vcos/pthreas', '-I' + rpi_path + '/interface/vmcs_host/linux']
 
