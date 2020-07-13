@@ -22,6 +22,13 @@ if not gst_dep.found() or not gstbase_dep.found() or not gstvideo_dep.found()
         or similar. The minimum version required is ''' + gst_req)
 endif
 
+if gstvideo_dep.version().version_compare('>= 1.17.2')
+  error('''
+
+        gst-rpicamsrc has moved into gst-plugins-good, and since you are using
+        a recent version of GStreamer you should pick it up from there.''')
+endif
+
 plugins_install_dir = '@0@/gstreamer-1.0'.format(get_option('libdir'))
 
 cc = meson.get_compiler('c')
