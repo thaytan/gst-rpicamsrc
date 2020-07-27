@@ -2,6 +2,13 @@ gst-rpicamsrc is a GStreamer wrapper around the raspivid/raspistill
 functionality of the RaspberryPi, providing a GStreamer
 source element capturing from the Rpi camera.
 
+** rpicamsrc has moved **
+GStreamer 1.18 will include rpicamsrc directly. The GStreamer git master repository already
+includes it, plus fixes beyond this tree. Future development will happen directly in the 
+GStreamer repositories, and this tree archived.
+
+Old README:
+
 To use it, you need GStreamer 1.0. As of the last time this README
 was updated, Raspbian Jessie has GStreamer 1.4.4, which is recent enough.
 
