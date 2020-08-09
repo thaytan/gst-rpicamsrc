@@ -938,7 +938,7 @@ raspi_capture_fill_buffer(RASPIVID_STATE *state, GstBuffer **bufp,
   GstClockTime gst_pts = GST_CLOCK_TIME_NONE;
 
   do {
-    buffer = mmal_queue_timedwait(state->encoded_buffer_q, 500);
+    buffer = mmal_queue_wait(state->encoded_buffer_q);
     // Work around a bug where mmal_queue_timedwait() might return
     // immediately if the internal timeout time aligns exactly
     // with a 1 second rollover boundary by checking errno.
