@@ -76,7 +76,8 @@ static XREF_T awb_map[] =
    {"fluorescent",   MMAL_PARAM_AWBMODE_FLUORESCENT},
    {"incandescent",  MMAL_PARAM_AWBMODE_INCANDESCENT},
    {"flash",         MMAL_PARAM_AWBMODE_FLASH},
-   {"horizon",       MMAL_PARAM_AWBMODE_HORIZON}
+   {"horizon",       MMAL_PARAM_AWBMODE_HORIZON},
+   {"greyworld",     MMAL_PARAM_AWBMODE_GREYWORLD}
 };
 
 static const int awb_map_size = sizeof(awb_map) / sizeof(awb_map[0]);
@@ -1110,6 +1111,7 @@ int raspicamcontrol_set_exposure_mode(MMAL_COMPONENT_T *camera, MMAL_PARAM_EXPOS
  *   - MMAL_PARAM_AWBMODE_INCANDESCENT,
  *   - MMAL_PARAM_AWBMODE_FLASH,
  *   - MMAL_PARAM_AWBMODE_HORIZON,
+ *   - MMAL_PARAM_AWBMODE_GREYWORLD,
  * @return 0 if successful, non-zero if any parameters out of range
  */
 int raspicamcontrol_set_awb_mode(MMAL_COMPONENT_T *camera, MMAL_PARAM_AWBMODE_T awb_mode)
